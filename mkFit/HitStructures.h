@@ -270,7 +270,80 @@ struct HoTNode
 {
   HitOnTrack m_hot;
   int        m_prev_idx;
+
+  int   m_index_ovlp = -1;
+  // Those two can go out if they turn out to not be needed
+  float m_chi2_ovlp;
+  float m_chi2;        // Only available for CE
 };
+
+struct HitMatch
+{
+  int   m_hit_idx;
+  int   m_module_id;
+  float m_chi2;
+
+  void reset() { m_hit_idx = -1;  m_module_id = -1; m_chi2 = 1e9; }
+};
+
+struct HitMatchPair
+{
+  HitMatch M[2];
+
+  void reset() { M[0].reset(); M[1].reset(); }
+
+  void consider_hit_for_overlap(int hit_idx, int module_id, float chi2)
+  {
+    if (module_id == M[0].m_module_id)
+    {
+      if (chi2 < M[0].m_chi2) { M[0].m_chi2 = chi2;  M[0].m_hit_idx = hit_idx; }
+    }
+    else if (module_id == M[1].m_module_id)
+    {
+      if (chi2 < M[1].m_chi2) { M[1].m_chi2 = chi2;  M[1].m_hit_idx = hit_idx; }
+    }
+    else
+    {
+      if (M[0].m_chi2 > M[1].m_chi2)
+      {
+        if (chi2 < M[0].m_chi2) { M[0] = { hit_idx, module_id, chi2 }; }
+      }
+      else
+      {
+        if (chi2 < M[1].m_chi2) { M[1] = { hit_idx, module_id, chi2 }; }
+      }
+    }
+  }
+
+  HitMatch* find_overlap(int hit_idx, int module_id)
+  {
+    if (module_id == M[0].m_module_id)
+    {
+      if (M[1].m_hit_idx >= 0) return &M[1];
+    }
+    else if (module_id == M[1].m_module_id)
+    {
+      if (M[0].m_hit_idx >= 0) return &M[0];
+    }
+    else
+    {
+      if (M[0].m_chi2 <= M[1].m_chi2)
+      {
+        if (M[0].m_hit_idx >= 0) return &M[0];
+      }
+      else
+      {
+        if (M[1].m_hit_idx >= 0) return &M[1];
+      }
+    }
+
+    return nullptr;
+  }
+};
+
+
+//------------------------------------------------------------------------------
+
 
 class CombCandidate;
 
@@ -280,8 +353,8 @@ public:
   TrackCand() {}
 
   explicit TrackCand(const TrackBase& base, CombCandidate* ccand) :
-    TrackBase(base),
-    m_comb_candidate(ccand)
+    TrackBase        (base),
+    m_comb_candidate (ccand)
   {
     // Reset hit counters -- caller has to initialize hits.
     lastHitIdx_ = -1;
@@ -294,11 +367,13 @@ public:
   int  lastCcIndex()  const { return lastHitIdx_; }
   int  nFoundHits()   const { return nFoundHits_; }
   int  nMissingHits() const { return nMissingHits_; }
+  int  nOverlapHits() const { return nOverlapHits_; }
   int  nTotalHits()   const { return nFoundHits_ + nMissingHits_; }
 
   void setLastCcIndex(int i)  { lastHitIdx_   = i; }
   void setNFoundHits(int n)   { nFoundHits_   = n; }
   void setNMissingHits(int n) { nMissingHits_ = n; }
+  void setNOverlapHits(int n) { nOverlapHits_ = n; }
 
   int  nInsideMinusOneHits() const { return nInsideMinusOneHits_; }
   int  nTailMinusOneHits()   const { return nTailMinusOneHits_; }
@@ -306,25 +381,37 @@ public:
   void setNInsideMinusOneHits(int n) { nInsideMinusOneHits_ = n; }
   void setNTailMinusOneHits(int n)   { nTailMinusOneHits_ = n; }
 
+  int  originIndex()    const { return m_origin_index; }
+  void setOriginIndex(int oi) { m_origin_index = oi; }
+
   // Inlines after definition of CombCandidate
 
   HitOnTrack getLastHitOnTrack() const;
   int        getLastHitIdx()     const;
   int        getLastHitLyr()     const;
 
-  void addHitIdx(int hitIdx, int hitLyr, float chi2);
+  void  addHitIdx(int hitIdx, int hitLyr, float chi2);
+
+        HoTNode& refLastHoTNode();       // for filling up overlap info
+  const HoTNode& refLastHoTNode() const; // for dump traversal
+
+  void  incOverlapCount() { ++nOverlapHits_; }
 
   Track exportTrack() const;
 
 protected:
   CombCandidate *m_comb_candidate = nullptr;
+
   // using from TrackBase:
   // short int lastHitIdx_
   // short int nFoundHits_
   short int    nMissingHits_        = 0;
+  short int    nOverlapHits_        = 0;
 
   short int    nInsideMinusOneHits_ = 0;
   short int    nTailMinusOneHits_   = 0;
+
+  short int    m_origin_index   = -1; // index of origin candidate (used for overlaps in Standard)
 };
 
 inline bool sortByScoreTrackCand(const TrackCand & cand1, const TrackCand & cand2)
@@ -340,11 +427,12 @@ inline float getScoreCand(const TrackCand& cand1)
   float pt = cand1.pT();
   float chi2 = cand1.chi2();
   // Do not allow for chi2<0 in score calculation
-  if(chi2<0) chi2=0.f;
+  if (chi2 < 0) chi2 = 0.f;
   // Do not allow for chi2>2^14/2/10 in score calculation (15 bits for (int) score x 10: 14 bits for score magnitude + 1 bit for sign --> max chi2 = 1/2*1/10*2^14=819.2)
-  if(chi2 > Config::maxChi2ForRanking_) chi2=Config::maxChi2ForRanking_;
-  return getScoreCalc(seedtype,nfoundhits,nmisshits,chi2,pt);
+  if (chi2 > Config::maxChi2ForRanking_) chi2 = Config::maxChi2ForRanking_;
+  return getScoreCalc(seedtype, nfoundhits, nmisshits, chi2, pt);
 }
+
 
 // This inheritance sucks but not doing it will require more changes.
 
@@ -361,9 +449,12 @@ public:
   int                  m_hots_size = 0;
   std::vector<HoTNode> m_hots;
 
+  std::vector<HitMatchPair> m_overlap_hits; // XXXX HitMatchPair could be a member in TrackCand
+
+
   CombCandidate()
   {
-    reserve(Config::maxCandsPerSeed); //we should never exceed this
+    reserve(Config::maxCandsPerSeed); // we should never exceed this - XXXX check, enforce, use common storage per event
     m_best_short_cand.setScore( getScoreWorstPossible() );
 
     // this will be different for CloneEngine and Std, especially as long as we
@@ -371,6 +462,8 @@ public:
     // ce:  N_layer * N_cands ~~ 20 * 6 = 120
     // std: i don't know, let's say double
     m_hots.reserve(256);
+
+    m_overlap_hits.resize(Config::maxCandsPerSeed);
   }
 
   void Reset()
@@ -386,6 +479,16 @@ public:
   {
     m_hots.push_back({hot, prev_idx});
     return m_hots_size++;
+  }
+
+  void considerHitForOverlap(int cand_idx, int hit_idx, int module_id, float chi2)
+  {
+    m_overlap_hits[cand_idx].consider_hit_for_overlap(hit_idx, module_id, chi2);
+  }
+
+  HitMatch* findOverlap(int cand_idx, int hit_idx, int module_id)
+  {
+    return m_overlap_hits[cand_idx].find_overlap(hit_idx, module_id);
   }
 
   void MergeCandsAndBestShortOne(bool update_score, bool sort_cands);
@@ -408,14 +511,27 @@ inline int TrackCand::getLastHitLyr() const
    return m_comb_candidate->m_hots[lastHitIdx_].m_hot.layer;
 }
 
+inline HoTNode& TrackCand::refLastHoTNode()
+{
+  return m_comb_candidate->m_hots[lastHitIdx_];
+}
+
+inline const HoTNode& TrackCand::refLastHoTNode() const
+{
+  return m_comb_candidate->m_hots[lastHitIdx_];
+}
+
+
 //------------------------------------------------------------------------------
 
 inline void TrackCand::addHitIdx(int hitIdx, int hitLyr, float chi2)
 {
   lastHitIdx_ = m_comb_candidate->AddHit({ hitIdx, hitLyr }, lastHitIdx_);
+
   if (hitIdx >= 0 || hitIdx == -9)
   {
-    ++nFoundHits_; chi2_+=chi2;
+    ++nFoundHits_;
+    chi2_                += chi2;
     nInsideMinusOneHits_ += nTailMinusOneHits_;
     nTailMinusOneHits_    = 0;
   } else {

@@ -275,11 +275,12 @@ void LayerOfHits::PrintBins()
 
 Track TrackCand::exportTrack() const
 {
-  // printf("TrackCand::exportTrack %p, label=%d\n", this, label());
+  // printf("TrackCand::exportTrack label=%5d, %2d + %2d = %2d\n", label(),
+  //        nTotalHits(), nOverlapHits_, nTotalHits() + nOverlapHits_);
 
   Track res(*this);
 
-  int nh = nTotalHits();
+  int nh = nTotalHits() + nOverlapHits_;
   int ch = lastHitIdx_;
   std::vector<HitOnTrack> hots(nh);
   while (--nh >= 0)
@@ -289,11 +290,21 @@ Track TrackCand::exportTrack() const
     // printf("  nh=%2d, ch=%d, idx=%d lyr=%d prev_idx=%d\n",
     //        nh, ch, hot_node.m_hot.index, hot_node.m_hot.layer, hot_node.m_prev_idx);
 
+    // Put in overlap hit if it exits. Note, this will be after the original
+    // hit in the track, but before for the backward fit iteration.
+    // This fact is used in MkFinder::BkFitFitTracks() to skip the overlap hits.
+    if (hot_node.m_index_ovlp >= 0)
+    {
+      hots[nh] = { hot_node.m_index_ovlp, hot_node.m_hot.layer };
+      --nh;
+    }
+
     hots[nh] = hot_node.m_hot;
     ch       = hot_node.m_prev_idx;
   }
 
-  res.reserveHits(nTotalHits());
+  // Rewrite for direct placement during iteration above.
+  res.reserveHits(nTotalHits() + nOverlapHits_);
   for (auto & i : hots)
   {
     res.addHitIdx(i.index, i.layer, 0.0f);
