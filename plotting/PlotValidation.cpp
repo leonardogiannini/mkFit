@@ -123,10 +123,10 @@ void PlotValidation::PlotEffTree()
 	  const auto & rate  = rates [l];
 	  const auto & srate = srates[l];
 
-      // plot names and key
+	  // plot names and key
 	  const TString plotkey   = Form("%i_%i_%i_%i",i,j,k,l);
 	  const TString plotname  = Form("%s_",fCmsswComp?"cmssw":"sim")+var+"_"+trk+"_pt"+hptcut;
-      const TString plottitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+svar+sunit+";"+srate;
+	  const TString plottitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+svar+sunit+";"+srate;
 
       // eff and dr not split by region
 	  if (l < 2)
@@ -143,7 +143,7 @@ void PlotValidation::PlotEffTree()
 
 	      const TString tmpkey   = Form("%s_%i",plotkey.Data(),m);
 	      const TString tmpname  = rate+"_"+reg+"_"+plotname;
-          const TString tmptitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+ "{"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+", "+sreg+"};"+svar+sunit+";"+srate;
+	      const TString tmptitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+ "{"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+", "+sreg+"};"+svar+sunit+";"+srate;
 
 	      plots[tmpkey] = new TEfficiency(tmpname.Data(),tmptitle.Data(),varbins.size()-1,bins);
 	    } // end loop over regions
@@ -383,7 +383,7 @@ void PlotValidation::PlotFRTree()
 	// plot names and key
 	const TString plotkey   = Form("%i_%i_%i",i,j,k);
 	const TString plotname  = "fr_reco_"+var+"_"+trk+"_pt"+hptcut;
-    const TString plottitle = strk+" Track Fake Rate vs Reco "+svar+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+svar+sunit+";Fake Rate";
+	const TString plottitle = strk+" Track Fake Rate vs Reco "+svar+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+svar+sunit+";Fake Rate";
 
 	// get bins for the variable of interest
 	const auto & varbins  = fVarBins[i];
@@ -410,7 +410,7 @@ void PlotValidation::PlotFRTree()
 	  // plot names and key
 	  const TString histkey   = Form("%i_%i_%i_%i",j,k,n,o);
 	  const TString histname  = "h_"+trkqual+"_"+coll+"_"+trk+"_pt"+hptcut;
-      const TString histtitle = scoll+" "+strk+" Track vs "+strkqual+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+strkqual+";nTracks";
+	  const TString histtitle = scoll+" "+strk+" Track vs "+strkqual+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+strkqual+";nTracks";
 
 	  // Numerator only type plots only!
 	  hists[histkey] = new TH1F(histname.Data(),histtitle.Data(),varbins.size()-1,bins);
@@ -437,7 +437,7 @@ void PlotValidation::PlotFRTree()
 	  // plot names and key
 	  const TString histkey   = Form("%i_%i_d_%i_%i",j,k,p,o);
 	  const TString histname  = "h_"+dvar+"_"+coll+"_"+trk+"_pt"+hptcut;
-      const TString histtitle = "#Delta"+sdvar+"("+scoll+" "+strk+","+fSRefTitle+") {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+sdvar+"^{"+scoll+" "+strk+"}-"+sdvar+"^{"+fSRefTitle+"};nTracks";
+	  const TString histtitle = "#Delta"+sdvar+"("+scoll+" "+strk+","+fSRefTitle+") {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+sdvar+"^{"+scoll+" "+strk+"}-"+sdvar+"^{"+fSRefTitle+"};nTracks";
 	    
 	  // Numerator only type plots only!
 	  hists[histkey] = new TH1F(histname.Data(),histtitle.Data(),varbins.size()-1,bins);
@@ -815,7 +815,7 @@ void PlotValidation::PrintTotals()
 	const auto & type    = types   [l];
 	const auto & dirname = dirnames[l];
 
-	const TString plotkey  = Form("%i_%i_%i",j,k,l);
+    const TString plotkey  = Form("%i_%i_%i",j,k,l);
 	const TString plotname = dirname+fSRefDir+"/"+rate+"_"+type+"_phi_"+trk+"_pt"+hptcut;
 	plots[plotkey] = (TEfficiency*)fOutRoot->Get(plotname.Data());
       }
