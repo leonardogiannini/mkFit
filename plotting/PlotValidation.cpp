@@ -815,7 +815,7 @@ void PlotValidation::PrintTotals()
 	const auto & type    = types   [l];
 	const auto & dirname = dirnames[l];
 
-    const TString plotkey  = Form("%i_%i_%i",j,k,l);
+        const TString plotkey  = Form("%i_%i_%i",j,k,l);
 	const TString plotname = dirname+fSRefDir+"/"+rate+"_"+type+"_phi_"+trk+"_pt"+hptcut;
 	plots[plotkey] = (TEfficiency*)fOutRoot->Get(plotname.Data());
       }
