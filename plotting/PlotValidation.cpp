@@ -123,12 +123,12 @@ void PlotValidation::PlotEffTree()
 	  const auto & rate  = rates [l];
 	  const auto & srate = srates[l];
 
-	  // plot names and key
+      // plot names and key
 	  const TString plotkey   = Form("%i_%i_%i_%i",i,j,k,l);
 	  const TString plotname  = Form("%s_",fCmsswComp?"cmssw":"sim")+var+"_"+trk+"_pt"+hptcut;
-	  const TString plottitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+" {"+fSVarPt+" > "+sptcut+" "+fSUnitPt+"};"+svar+sunit+";"+srate;
+      const TString plottitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+svar+sunit+";"+srate;
 
-	  // eff and dr not split by region
+      // eff and dr not split by region
 	  if (l < 2)
 	  {
 	    const TString tmpname = rate+"_"+plotname;
@@ -143,7 +143,7 @@ void PlotValidation::PlotEffTree()
 
 	      const TString tmpkey   = Form("%s_%i",plotkey.Data(),m);
 	      const TString tmpname  = rate+"_"+reg+"_"+plotname;
-	      const TString tmptitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+ "{"+fSVarPt+" > "+sptcut+" "+fSUnitPt+", "+sreg+"};"+svar+sunit+";"+srate;
+          const TString tmptitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+ "{"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+", "+sreg+"};"+svar+sunit+";"+srate;
 
 	      plots[tmpkey] = new TEfficiency(tmpname.Data(),tmptitle.Data(),varbins.size()-1,bins);
 	    } // end loop over regions
@@ -231,9 +231,18 @@ void PlotValidation::PlotEffTree()
     // loop over plot indices
     for (auto k = 0U; k < fNPtCuts; k++) // loop over pt cuts
     {
+      if (k<fNPtCutsIncl)
+      {
       const auto ptcut = fPtCuts[k];
-
       if (pt_ref < ptcut) continue; // cut on tracks with a low pt
+      }
+      else
+      {
+      const auto ptcut = fPtCuts[k-fNPtCutsIncl];
+      const auto ptcutup = fPtCuts[k-fNPtCutsIncl+1];
+      if (pt_ref > ptcutup) continue;
+      if (pt_ref < ptcut) continue;
+      }
 
       for (auto i = 0U; i < fNVars; i++)  // loop over vars index
       {
@@ -374,7 +383,7 @@ void PlotValidation::PlotFRTree()
 	// plot names and key
 	const TString plotkey   = Form("%i_%i_%i",i,j,k);
 	const TString plotname  = "fr_reco_"+var+"_"+trk+"_pt"+hptcut;
-	const TString plottitle = strk+" Track Fake Rate vs Reco "+svar+" {"+fSVarPt+" > "+sptcut+" "+fSUnitPt+"};"+svar+sunit+";Fake Rate";
+    const TString plottitle = strk+" Track Fake Rate vs Reco "+svar+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+svar+sunit+";Fake Rate";
 
 	// get bins for the variable of interest
 	const auto & varbins  = fVarBins[i];
@@ -401,7 +410,7 @@ void PlotValidation::PlotFRTree()
 	  // plot names and key
 	  const TString histkey   = Form("%i_%i_%i_%i",j,k,n,o);
 	  const TString histname  = "h_"+trkqual+"_"+coll+"_"+trk+"_pt"+hptcut;
-	  const TString histtitle = scoll+" "+strk+" Track vs "+strkqual+" {"+fSVarPt+" > "+sptcut+" "+fSUnitPt+"};"+strkqual+";nTracks";
+      const TString histtitle = scoll+" "+strk+" Track vs "+strkqual+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+strkqual+";nTracks";
 
 	  // Numerator only type plots only!
 	  hists[histkey] = new TH1F(histname.Data(),histtitle.Data(),varbins.size()-1,bins);
@@ -428,7 +437,7 @@ void PlotValidation::PlotFRTree()
 	  // plot names and key
 	  const TString histkey   = Form("%i_%i_d_%i_%i",j,k,p,o);
 	  const TString histname  = "h_"+dvar+"_"+coll+"_"+trk+"_pt"+hptcut;
-	  const TString histtitle = "#Delta"+sdvar+"("+scoll+" "+strk+","+fSRefTitle+") {"+fSVarPt+" > "+sptcut+" "+fSUnitPt+"};"+sdvar+"^{"+scoll+" "+strk+"}-"+sdvar+"^{"+fSRefTitle+"};nTracks";
+      const TString histtitle = "#Delta"+sdvar+"("+scoll+" "+strk+","+fSRefTitle+") {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+sdvar+"^{"+scoll+" "+strk+"}-"+sdvar+"^{"+fSRefTitle+"};nTracks";
 	    
 	  // Numerator only type plots only!
 	  hists[histkey] = new TH1F(histname.Data(),histtitle.Data(),varbins.size()-1,bins);
@@ -619,9 +628,18 @@ void PlotValidation::PlotFRTree()
 
       for (auto k = 0U; k < fNPtCuts; k++) // loop over pt cuts
       {
-	const auto ptcut = fPtCuts[k];
-      
-	if (pt_trk < ptcut) continue; // cut on tracks with a low pt
+        if (k<fNPtCutsIncl)
+        {
+        const auto ptcut = fPtCuts[k];
+        if (pt_trk < ptcut) continue; // cut on tracks with a low pt
+        }
+        else
+        {
+        const auto ptcut = fPtCuts[k-fNPtCutsIncl];
+        const auto ptcutup = fPtCuts[k-fNPtCutsIncl+1];
+        if (pt_trk > ptcutup) continue;
+        if (pt_trk < ptcut) continue;
+        }
     
 	// fill rate plots
 	for (auto i = 0U; i < fNVars; i++)  // loop over vars index
@@ -817,7 +835,7 @@ void PlotValidation::PrintTotals()
     for (auto k = 0U; k < fNPtCuts; k++)
     {
       const auto & hptcut = fHPtCuts[k];
-      
+
       for (auto n = 0U; n < fNTrkQual; n++) 
       {
 	const auto & trkqual = fTrkQual[n];
@@ -850,6 +868,10 @@ void PlotValidation::PrintTotals()
 
   for (auto k = 0U; k < fNPtCuts; k++)
   {
+
+    if (k < fNPtCutsIncl)
+    {
+
     const auto & ptcut = fPtCuts[k];
 
     std::cout << Form("xxxxxxxxxx Track pT > %3.1f Cut xxxxxxxxxx",ptcut) << std::endl;
@@ -857,6 +879,21 @@ void PlotValidation::PrintTotals()
 
     totalsout << Form("xxxxxxxxxx Track pT > %3.1f Cut xxxxxxxxxx",ptcut) << std::endl;
     totalsout << std::endl;
+
+    }
+    else
+    {
+
+    const auto & ptcut = fPtCuts[k-fNPtCutsIncl];
+    const auto & ptcutup = fPtCuts[k-fNPtCutsIncl+1];
+
+    std::cout << Form("xxxxxxxxxx Track pT in range %3.1f - %3.1f  xxxxxxxxxx",ptcut, ptcutup) << std::endl;
+    std::cout << std::endl;
+
+    totalsout << Form("xxxxxxxxxx Track pT in range %3.1f - %3.1f  xxxxxxxxxx",ptcut, ptcutup) << std::endl;
+    totalsout << std::endl;
+
+    }
   
     for (auto j = 0U; j < fNTrks; j++)
     {
@@ -1016,7 +1053,7 @@ void PlotValidation::SetupStyle()
 void PlotValidation::SetupBins()
 {
   // pt bins
-  PlotValidation::SetupVariableBins("0 0.25 0.5 0.75 1 1.25 1.5 1.75 2 2.5 3 3.5 4 4.5 5 5 6 7 8 9 10 15 20 25 30 40 50 100 200 500 1000",fPtBins);
+  PlotValidation::SetupVariableBins("0 0.25 0.5 0.75 1 1.25 1.5 1.75 2 2.5 3 3.5 4 4.5 5 6 7 8 9 10 15 20 25 30 40 50 100 200 500 1000",fPtBins);
   
   // eta bins
   PlotValidation::SetupFixedBins(60,-3,3,fEtaBins);
@@ -1095,13 +1132,20 @@ void PlotValidation::SetupCommonVars()
   // which pt cuts
   fPtCuts = {0.f,0.9f,2.f};
   for (const auto ptcut : fPtCuts) {fSPtCuts.emplace_back(Form("%3.1f",ptcut));}
+  for (auto i = 0U; i < fPtCuts.size()-1; i++)
+  {
+    const auto ptcut = fPtCuts[i];
+    const auto ptcutup = fPtCuts[i+1];
+    fSPtCuts.emplace_back(Form("%3.1f-%3.1f",ptcut,ptcutup));
+  }
   for (const auto & sptcut : fSPtCuts)
   {
     TString hptcut = sptcut;
     hptcut.ReplaceAll(".","p");
     fHPtCuts.emplace_back(hptcut);
   }
-  fNPtCuts = fPtCuts.size();
+  fNPtCutsIncl = fPtCuts.size();
+  fNPtCuts = fPtCuts.size()*2-1;
   
   // quality info
   fTrkQual  = {"nHits","fracHitsMatched","score"};

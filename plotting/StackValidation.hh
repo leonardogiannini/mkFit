@@ -55,6 +55,15 @@ namespace
       ptcut.ReplaceAll(".","p");
       ptcuts.emplace_back(ptcut);
     }
+    for (auto i = 0U; i < tmp_ptcuts.size()-1; i++)
+    {
+      const auto ptcutdown = tmp_ptcuts[i];
+      const auto ptcutup = tmp_ptcuts[i+1];
+      TString ptcut = Form("%3.1f-%3.1f",ptcutdown,ptcutup);
+      ptcut.ReplaceAll(".","p");
+      std::cout << ptcut << std::endl;
+      ptcuts.emplace_back(ptcut);
+    }
 
     // set nptcuts once ptcuts is set
     nptcuts = ptcuts.size();

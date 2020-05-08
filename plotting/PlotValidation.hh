@@ -129,6 +129,7 @@ private:
   TStrVec fSPtCuts;
   TStrVec fHPtCuts;
   UInt_t  fNPtCuts;
+  UInt_t  fNPtCutsIncl; // as opposed to exclusive bins
 
   // track quality plots
   TStrVec fTrkQual;
