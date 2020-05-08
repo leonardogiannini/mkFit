@@ -106,7 +106,7 @@ mv validation_${vBase}_${simval[i]}/totals_validation_${vBase}_${simval[i]}.txt 
 # Move rate plots for SimTrack Validation
 for rate in eff ineff_brl ineff_trans ineff_ec dr fr
 do
-    for pt in 0p0 0p9 2p0
+    for pt in 0p0 0p9 2p0 0p0-0p9 0p9-2p0
     do
 	for var in phi eta nLayers
 	do 
@@ -128,7 +128,7 @@ for coll in bestmatch allmatch
 do 
     for var in nHits invpt phi eta
     do
-	for pt in 0p0 0p9 2p0
+	for pt in 0p0 0p9 2p0 0p0-0p9 0p9-2p0
 	do
 	    mv ${val_arch}_${sample}_${coll}_"d"${var}_"build"_"pt"${pt}_${simval[i]}.png ${dir}/${simdir[i]}/diffs
 	done
@@ -138,7 +138,7 @@ done
 # Move track quality plots for SimTrack Validation (nHits,score)
 for coll in allreco fake bestmatch allmatch
 do 
-    for pt in 0p0 0p9 2p0
+    for pt in 0p0 0p9 2p0 0p0-0p9 0p9-2p0
     do
 	for qual in nHits score
 	do
