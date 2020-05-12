@@ -128,7 +128,7 @@ void PlotValidation::PlotEffTree()
 	  const TString plotname  = Form("%s_",fCmsswComp?"cmssw":"sim")+var+"_"+trk+"_pt"+hptcut;
 	  const TString plottitle = strk+" Track "+srate+" vs "+fSRefTitle+" "+svar+" {"+fSVarPt+Form(" %s ",(k < fNPtCutsIncl)?">":"in range")+sptcut+" "+fSUnitPt+"};"+svar+sunit+";"+srate;
 
-      // eff and dr not split by region
+         // eff and dr not split by region
 	  if (l < 2)
 	  {
 	    const TString tmpname = rate+"_"+plotname;
@@ -815,7 +815,7 @@ void PlotValidation::PrintTotals()
 	const auto & type    = types   [l];
 	const auto & dirname = dirnames[l];
 
-        const TString plotkey  = Form("%i_%i_%i",j,k,l);
+	const TString plotkey  = Form("%i_%i_%i",j,k,l);
 	const TString plotname = dirname+fSRefDir+"/"+rate+"_"+type+"_phi_"+trk+"_pt"+hptcut;
 	plots[plotkey] = (TEfficiency*)fOutRoot->Get(plotname.Data());
       }
@@ -1053,7 +1053,7 @@ void PlotValidation::SetupStyle()
 void PlotValidation::SetupBins()
 {
   // pt bins
-  PlotValidation::SetupVariableBins("0 0.25 0.5 0.75 1 1.25 1.5 1.75 2 2.5 3 3.5 4 4.5 5 6 7 8 9 10 15 20 25 30 40 50 100 200 500 1000",fPtBins);
+  PlotValidation::SetupVariableBins("0 0.3 0.6 0.9 1.2 1.5 2 2.5 3 3.5 4 4.5 5 6 7 8 9 10 15 20 25 30 40 50 100 200 500 1000",fPtBins);
   
   // eta bins
   PlotValidation::SetupFixedBins(60,-3,3,fEtaBins);
