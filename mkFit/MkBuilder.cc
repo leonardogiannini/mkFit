@@ -1498,7 +1498,7 @@ void MkBuilder::PrepareSeeds()
 
     if (Config::seedCleaning == cleanSeedsN2)
     {
-      m_event->clean_cms_seedtracks();
+      m_event->clean_cms_seedtracks_multiiter();
 
       // Select specific cmssw seed for detailed debug.
       // {

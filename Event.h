@@ -50,6 +50,9 @@ public:
   void relabel_bad_seedtracks();
   void relabel_cmsswtracks_from_seeds();
   
+  int clean_cms_seedtracks_multiiter();
+  void clean_indices_algo(unsigned int algo, std::vector<int> indices, std::vector<bool> &writetrack);
+  
   inline bool is_trackvec_empty(const TrackVec & tracks) { return tracks.empty(); }
 
   void print_tracks(const TrackVec& tracks, bool print_hits) const;

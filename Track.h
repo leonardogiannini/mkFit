@@ -324,6 +324,7 @@ public:
 
 
   TrackAlgorithm algorithm() const { return TrackAlgorithm(status_.algorithm); }
+  unsigned int getAlgorithm() const { return status_.algorithm; }
   void setAlgorithm(TrackAlgorithm algo) { status_.algorithm = static_cast<unsigned int>(algo); }
 
   // To be used later

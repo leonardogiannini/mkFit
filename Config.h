@@ -349,6 +349,67 @@ namespace Config
   constexpr float c_drmax_hpt = 0.010;
   constexpr float c_dzmax_els = 0.015;
   constexpr float c_drmax_els = 0.015;
+  
+  
+  constexpr float c_ptthr_hpt = 2.0;
+  constexpr float c_ptthr_lpt = 0.5;
+  //initial
+  constexpr float c_drmax_init_bh = 0.007;
+  constexpr float c_dzmax_init_bh = 0.007;
+  constexpr float c_drmax_init_eh = 0.018;
+  constexpr float c_dzmax_init_eh = 0.018;
+  constexpr float c_drmax_init_bl = 0.018;
+  constexpr float c_dzmax_init_bl = 0.018;
+  constexpr float c_drmax_init_el = 0.018;
+  constexpr float c_dzmax_init_el = 0.018;
+  //hpt triplet
+  constexpr float c_drmax_hptt_bh = 0.018;
+  constexpr float c_dzmax_hptt_bh = 0.018;
+  constexpr float c_drmax_hptt_eh = 0.05;
+  constexpr float c_dzmax_hptt_eh = 0.018;
+  constexpr float c_drmax_hptt_bl = 0.018;
+  constexpr float c_dzmax_hptt_bl = 0.018;
+  constexpr float c_drmax_hptt_el = 0.05;
+  constexpr float c_dzmax_hptt_el = 0.018;
+  //lpt quad
+  constexpr float c_drmax_lptq_bh = 0.015;
+  constexpr float c_dzmax_lptq_bh = 0.015;
+  constexpr float c_drmax_lptq_eh = 0.015;
+  constexpr float c_dzmax_lptq_eh = 0.015;
+  constexpr float c_drmax_lptq_bl = 0.015;
+  constexpr float c_dzmax_lptq_bl = 0.015;
+  constexpr float c_drmax_lptq_el = 0.015;
+  constexpr float c_dzmax_lptq_el = 0.015;
+  //lpt triplet
+  constexpr float c_drmax_lptt_bh = 0.015;
+  constexpr float c_dzmax_lptt_bh = 0.015;
+  constexpr float c_drmax_lptt_eh = 0.015;
+  constexpr float c_dzmax_lptt_eh = 0.015;
+  constexpr float c_drmax_lptt_bl = 0.015;
+  constexpr float c_dzmax_lptt_bl = 0.015;
+  constexpr float c_drmax_lptt_el = 0.015;
+  constexpr float c_dzmax_lptt_el = 0.015;
+  //dis quad
+  constexpr float c_drmax_disq_bh = 0.015;
+  constexpr float c_dzmax_disq_bh = 0.015;
+  constexpr float c_drmax_disq_eh = 0.015;
+  constexpr float c_dzmax_disq_eh = 0.015;
+  constexpr float c_drmax_disq_bl = 0.015;
+  constexpr float c_dzmax_disq_bl = 0.015;
+  constexpr float c_drmax_disq_el = 0.015;
+  constexpr float c_dzmax_disq_el = 0.015;
+  //dis triplet
+  constexpr float c_drmax_dist_bh = 0.015;
+  constexpr float c_dzmax_dist_bh = 0.015;
+  constexpr float c_drmax_dist_eh = 0.015;
+  constexpr float c_dzmax_dist_eh = 0.015;
+  constexpr float c_drmax_dist_bl = 0.015;
+  constexpr float c_dzmax_dist_bl = 0.015;
+  constexpr float c_drmax_dist_el = 0.015;
+  constexpr float c_dzmax_dist_el = 0.015;
+  
+
+
 
   // track-related config on hit selection windows
   constexpr float treg_eta[2] = {0.45,1.5};

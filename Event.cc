@@ -851,6 +851,7 @@ int Event::clean_cms_seedtracks()
   std::vector<float>  x(ns);
   std::vector<float>  y(ns);
   std::vector<float>  z(ns);
+  std::vector<unsigned int> algo(ns);
 
   for(int ts=0; ts<ns; ts++){
     const Track & tk = seedTracks_[ts];
@@ -865,10 +866,12 @@ int Event::clean_cms_seedtracks()
     x[ts] = tk.x();
     y[ts] = tk.y();
     z[ts] = tk.z();
+    algo[ts] = tk.getAlgorithm(); 
   }
 
   for(int ts=0; ts<ns; ts++){
-
+    
+    if (!(algo[ts]==4||algo[ts]==5||algo[ts]==7||algo[ts]==22||algo[ts]==23||algo[ts]==24)) writetrack[ts]=false;
     if (not writetrack[ts]) continue;//FIXME: this speed up prevents transitive masking; check build cost!
 
     const float oldPhi1 = oldPhi[ts];
@@ -881,7 +884,9 @@ int Event::clean_cms_seedtracks()
     for (int tss= ts+1; tss<ns; tss++){
 
       const float Pt2 = pt[tss];
-
+      
+      ////// Always require seed algorithm consistency
+      if(algo[tss] != algo[ts]) continue;
       ////// Always require charge consistency. If different charge is assigned, do not remove seed-track
       if(charge[tss] != charge[ts])
         continue;
@@ -972,6 +977,302 @@ int Event::clean_cms_seedtracks()
 
   return seedTracks_.size();
 }
+
+
+int Event::clean_cms_seedtracks_multiiter()
+{
+
+  //grouping tracks by algorithm
+  const int ns = seedTracks_.size();
+  
+  std::vector<int> initial;
+  std::vector<int> hpt_triplet;
+  std::vector<int> lpt_quad;
+  std::vector<int> lpt_triplet;
+  std::vector<int> dis_quad;
+  std::vector<int> dis_triplet;
+
+  TrackVec cleanSeedTracks;
+  cleanSeedTracks.reserve(ns);
+  std::vector<bool> writetrack(ns, true);
+  
+  int sumof=0;
+  for(int ts=0; ts<ns; ts++){ if(writetrack[ts]==true) sumof++;}
+  std::cout << "cleaning step here  tot size... " << ns << std::endl;
+  std::cout << "cleaning step here  tot write... " << sumof << std::endl;
+  
+  for(int ts=0; ts<ns; ts++){
+    const Track & tk = seedTracks_[ts];
+    unsigned int algo = tk.getAlgorithm();
+    if (algo==4) 
+        initial.push_back(ts);
+    else if (algo==22) 
+        hpt_triplet.push_back(ts);
+    else if (algo==23) 
+        lpt_quad.push_back(ts);
+    else if (algo==5) 
+        lpt_triplet.push_back(ts);
+    else if (algo==24) 
+        dis_quad.push_back(ts);
+    else if (algo==7) 
+        dis_triplet.push_back(ts);
+    else 
+        writetrack[ts]=false;
+      
+  }
+  
+  sumof=0;
+  for(int ts=0; ts<ns; ts++){ if(writetrack[ts]==true) sumof++;}
+  std::cout << "cleaning step here  tot write... " << sumof << std::endl;
+
+  clean_indices_algo(4,initial,writetrack);
+  clean_indices_algo(22,hpt_triplet,writetrack);
+  clean_indices_algo(23,lpt_quad,writetrack);
+  clean_indices_algo(5,lpt_triplet,writetrack);
+  clean_indices_algo(24,dis_quad,writetrack);
+  clean_indices_algo(7,dis_triplet,writetrack);
+  
+  sumof=0;
+  for(int ts=0; ts<ns; ts++){ if(writetrack[ts]==true) sumof++;}
+  std::cout << "cleaning step here  tot write... " << sumof << std::endl;
+  
+  
+  for(int ts=0; ts<ns; ts++){    
+      if(writetrack[ts])
+          cleanSeedTracks.emplace_back(seedTracks_[ts]);
+
+  }
+  
+  seedTracks_.swap(cleanSeedTracks);
+  return seedTracks_.size();
+}
+
+
+void Event::clean_indices_algo(unsigned int algo, std::vector<int> indices, std::vector<bool> &writetrack)
+{
+  
+  const float etamax_brl = Config::c_etamax_brl;
+  const float dpt_brl_0  = Config::c_dpt_brl_0;
+  const float dpt_ec_0   = Config::c_dpt_ec_0;
+  const float ptmax_0    = Config::c_ptmax_0;
+  const float dpt_1      = Config::c_dpt_1;
+  const float ptmax_1    = Config::c_ptmax_1;
+  const float dpt_2      = Config::c_dpt_2;
+  const float ptmax_2    = Config::c_ptmax_2;
+  const float dpt_3      = Config::c_dpt_3;
+  
+  
+  float drmax_bh,  dzmax_bh;
+  float drmax_eh,  dzmax_eh;
+  float drmax_bl,  dzmax_bl;
+  float drmax_el,  dzmax_el;
+  float pt_thr;
+  
+  if (algo==4)
+  {
+    drmax_bh = Config::c_drmax_init_bh;
+    dzmax_bh = Config::c_dzmax_init_bh;
+    drmax_eh = Config::c_drmax_init_eh;
+    dzmax_eh = Config::c_dzmax_init_eh;
+    drmax_bl = Config::c_drmax_init_bl;
+    dzmax_bl = Config::c_dzmax_init_bl;
+    drmax_el = Config::c_drmax_init_el;
+    dzmax_el = Config::c_dzmax_init_el;
+    pt_thr = Config::c_ptthr_hpt; 
+  }
+  else if (algo==22)
+  {
+    drmax_bh = Config::c_drmax_hptt_bh;
+    dzmax_bh = Config::c_dzmax_hptt_bh;
+    drmax_eh = Config::c_drmax_hptt_eh;
+    dzmax_eh = Config::c_dzmax_hptt_eh;
+    drmax_bl = Config::c_drmax_hptt_bl;
+    dzmax_bl = Config::c_dzmax_hptt_bl;
+    drmax_el = Config::c_drmax_hptt_el;
+    dzmax_el = Config::c_dzmax_hptt_el;
+    pt_thr = Config::c_ptthr_hpt; 
+  }
+  else if (algo==23)
+  {
+    drmax_bh = Config::c_drmax_lptq_bh;
+    dzmax_bh = Config::c_dzmax_lptq_bh;
+    drmax_eh = Config::c_drmax_lptq_eh;
+    dzmax_eh = Config::c_dzmax_lptq_eh;
+    drmax_bl = Config::c_drmax_lptq_bl;
+    dzmax_bl = Config::c_dzmax_lptq_bl;
+    drmax_el = Config::c_drmax_lptq_el;
+    dzmax_el = Config::c_dzmax_lptq_el;
+    pt_thr = Config::c_ptthr_lpt; 
+  }
+  else if (algo==5)
+  {
+    drmax_bh = Config::c_drmax_lptt_bh;
+    dzmax_bh = Config::c_dzmax_lptt_bh;
+    drmax_eh = Config::c_drmax_lptt_eh;
+    dzmax_eh = Config::c_dzmax_lptt_eh;
+    drmax_bl = Config::c_drmax_lptt_bl;
+    dzmax_bl = Config::c_dzmax_lptt_bl;
+    drmax_el = Config::c_drmax_lptt_el;
+    dzmax_el = Config::c_dzmax_lptt_el;
+    pt_thr = Config::c_ptthr_lpt; 
+  }
+    else if (algo==24)
+  {
+    drmax_bh = Config::c_drmax_dist_bh;
+    dzmax_bh = Config::c_dzmax_dist_bh;
+    drmax_eh = Config::c_drmax_dist_eh;
+    dzmax_eh = Config::c_dzmax_dist_eh;
+    drmax_bl = Config::c_drmax_dist_bl;
+    dzmax_bl = Config::c_dzmax_dist_bl;
+    drmax_el = Config::c_drmax_dist_el;
+    dzmax_el = Config::c_dzmax_dist_el;
+    pt_thr = Config::c_ptthr_hpt; 
+  }
+  else if (algo==7)
+  {
+    drmax_bh = Config::c_drmax_disq_bh;
+    dzmax_bh = Config::c_dzmax_disq_bh;
+    drmax_eh = Config::c_drmax_disq_eh;
+    dzmax_eh = Config::c_dzmax_disq_eh;
+    drmax_bl = Config::c_drmax_disq_bl;
+    dzmax_bl = Config::c_dzmax_disq_bl;
+    drmax_el = Config::c_drmax_disq_el;
+    dzmax_el = Config::c_dzmax_disq_el;
+    pt_thr = Config::c_ptthr_hpt; 
+  }
+  else return;
+  
+  const float dzmax2_bh = dzmax_bh*dzmax_bh;
+  const float drmax2_bh = drmax_bh*drmax_bh;
+  const float dzmax2_bl = dzmax_bl*dzmax_bl;
+  const float drmax2_bl = drmax_bl*drmax_bl;
+  const float dzmax2_eh = dzmax_eh*dzmax_eh;
+  const float drmax2_eh = drmax_eh*drmax_eh;
+  const float dzmax2_el = dzmax_el*dzmax_el;
+  const float drmax2_el = drmax_el*drmax_el;
+  
+  const int ns = indices.size();
+  
+  const float invR1GeV = 1.f/Config::track1GeVradius;
+
+  std::vector<int>    nHits(ns);
+  std::vector<int>    charge(ns);
+  std::vector<float>  oldPhi(ns);
+  std::vector<float>  pos2(ns);
+  std::vector<float>  eta(ns);
+  std::vector<float>  theta(ns);
+  std::vector<float>  invptq(ns);
+  std::vector<float>  pt(ns);
+  std::vector<float>  x(ns);
+  std::vector<float>  y(ns);
+  std::vector<float>  z(ns);
+
+  for(int ts=0; ts<ns; ts++){
+    const Track & tk = seedTracks_[indices[ts]];
+    nHits[ts] = tk.nFoundHits();
+    charge[ts] = tk.charge();
+    oldPhi[ts] = tk.momPhi();
+    pos2[ts] = std::pow(tk.x(), 2) + std::pow(tk.y(), 2);
+    eta[ts] = tk.momEta();
+    theta[ts] = std::atan2(tk.pT(),tk.pz());
+    invptq[ts] = tk.charge()*tk.invpT();
+    pt[ts] = tk.pT();
+    x[ts] = tk.x();
+    y[ts] = tk.y();
+    z[ts] = tk.z();
+  }
+  
+  for(int ts=0; ts<ns; ts++){
+
+    if (not writetrack[indices[ts]]) continue;//FIXME: this speed up prevents transitive masking; check build cost!
+
+    const float oldPhi1 = oldPhi[ts];
+    const float pos2_first = pos2[ts];
+    const float Eta1 = eta[ts];
+    const float Pt1 = pt[ts];
+    const float invptq_first = invptq[ts]; 
+
+    //#pragma simd /* Vectorization via simd had issues with icc */
+    for (int tss= ts+1; tss<ns; tss++){
+
+      const float Pt2 = pt[tss];
+
+      ////// Always require charge consistency. If different charge is assigned, do not remove seed-track
+      if(charge[tss] != charge[ts])
+        continue;
+      
+      const float thisDPt = std::abs(Pt2-Pt1);
+      ////// Require pT consistency between seeds. If dpT is large, do not remove seed-track.
+      ////// Adaptive thresholds, based on pT of reference seed-track (choice is a compromise between efficiency and duplicate rate):
+      ////// - 2.5% if track is barrel and w/ pT<2 GeV
+      ////// - 1.25% if track is non-barrel and w/ pT<2 GeV
+      ////// - 10% if track w/ 2<pT<5 GeV
+      ////// - 20% if track w/ 5<pT<10 GeV
+      ////// - 25% if track w/ pT>10 GeV
+      if(thisDPt>dpt_brl_0*(Pt1) && Pt1<ptmax_0 && std::abs(Eta1)<etamax_brl)
+	continue;
+
+      else if(thisDPt>dpt_ec_0*(Pt1) && Pt1<ptmax_0 && std::abs(Eta1)>etamax_brl)
+	continue;
+
+      else if(thisDPt>dpt_1*(Pt1) && Pt1>ptmax_0 && Pt1<ptmax_1)
+	continue;
+
+      else if(thisDPt>dpt_2*(Pt1) && Pt1>ptmax_1 && Pt1<ptmax_2)
+	continue;
+
+      else if(thisDPt>dpt_3*(Pt1) && Pt1>ptmax_2)
+	continue;
+
+
+      const float Eta2 = eta[tss];
+      const float deta2 = std::pow(Eta1-Eta2, 2);
+
+      const float oldPhi2 = oldPhi[tss];
+
+      const float pos2_second = pos2[tss];
+      const float thisDXYSign05 = pos2_second > pos2_first ? -0.5f : 0.5f;
+
+      const float thisDXY = thisDXYSign05*sqrt( std::pow(x[ts]-x[tss], 2) + std::pow(y[ts]-y[tss], 2) );
+      
+      const float invptq_second = invptq[tss];
+
+      const float newPhi1 = oldPhi1-thisDXY*invR1GeV*invptq_first;
+      const float newPhi2 = oldPhi2+thisDXY*invR1GeV*invptq_second;
+
+      const float dphi = cdist(std::abs(newPhi1-newPhi2));
+
+      const float dr2 = deta2+dphi*dphi;
+      
+      const float thisDZ = z[ts]-z[tss]-thisDXY*(1.f/std::tan(theta[ts])+1.f/std::tan(theta[tss]));
+      const float dz2 = thisDZ*thisDZ;
+
+      ////// Reject tracks within dR-dz elliptical window.
+      ////// Adaptive thresholds, based on observation that duplicates are more abundant at large pseudo-rapidity and low track pT
+      if(std::abs(Eta1)<etamax_brl){
+          if (Pt1>pt_thr) {
+            if(dz2/dzmax2_bh+dr2/drmax2_bh<1.0f) writetrack[indices[tss]]=false;           
+          }
+          else {
+            if(dz2/dzmax2_bl+dr2/drmax2_bl<1.0f) writetrack[indices[tss]]=false;           
+          }          
+      }
+      else{
+          if (Pt1>pt_thr) {
+            if(dz2/dzmax2_eh+dr2/drmax2_eh<1.0f) writetrack[indices[tss]]=false;           
+          }
+          else {
+            if(dz2/dzmax2_el+dr2/drmax2_el<1.0f) writetrack[indices[tss]]=false;           
+          }          
+      }
+
+    }
+
+  }
+  
+
+}
+
 
 int Event::clean_cms_seedtracks_badlabel()
 {
