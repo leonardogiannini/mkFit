@@ -52,6 +52,8 @@ public:
   
   int clean_cms_seedtracks_multiiter();
   void clean_indices_algo(unsigned int algo, std::vector<int> indices, std::vector<bool> &writetrack);
+  int select_tracks_multiiter();
+  
   
   inline bool is_trackvec_empty(const TrackVec & tracks) { return tracks.empty(); }
 

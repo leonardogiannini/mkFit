@@ -372,41 +372,41 @@ namespace Config
   constexpr float c_drmax_hptt_el = 0.05;
   constexpr float c_dzmax_hptt_el = 0.018;
   //lpt quad
-  constexpr float c_drmax_lptq_bh = 0.015;
-  constexpr float c_dzmax_lptq_bh = 0.015;
-  constexpr float c_drmax_lptq_eh = 0.015;
-  constexpr float c_dzmax_lptq_eh = 0.015;
-  constexpr float c_drmax_lptq_bl = 0.015;
-  constexpr float c_dzmax_lptq_bl = 0.015;
-  constexpr float c_drmax_lptq_el = 0.015;
-  constexpr float c_dzmax_lptq_el = 0.015;
+  constexpr float c_drmax_lptq_bh = 0.05;
+  constexpr float c_dzmax_lptq_bh = 0.05;
+  constexpr float c_drmax_lptq_eh = 0.05;
+  constexpr float c_dzmax_lptq_eh = 0.05;
+  constexpr float c_drmax_lptq_bl = 0.05;
+  constexpr float c_dzmax_lptq_bl = 0.05;
+  constexpr float c_drmax_lptq_el = 0.05;
+  constexpr float c_dzmax_lptq_el = 0.05;
   //lpt triplet
-  constexpr float c_drmax_lptt_bh = 0.015;
-  constexpr float c_dzmax_lptt_bh = 0.015;
-  constexpr float c_drmax_lptt_eh = 0.015;
-  constexpr float c_dzmax_lptt_eh = 0.015;
-  constexpr float c_drmax_lptt_bl = 0.015;
-  constexpr float c_dzmax_lptt_bl = 0.015;
-  constexpr float c_drmax_lptt_el = 0.015;
-  constexpr float c_dzmax_lptt_el = 0.015;
+  constexpr float c_drmax_lptt_bh = 0.05;
+  constexpr float c_dzmax_lptt_bh = 0.05;
+  constexpr float c_drmax_lptt_eh = 0.05;
+  constexpr float c_dzmax_lptt_eh = 0.05;
+  constexpr float c_drmax_lptt_bl = 0.05;
+  constexpr float c_dzmax_lptt_bl = 0.05;
+  constexpr float c_drmax_lptt_el = 0.05;
+  constexpr float c_dzmax_lptt_el = 0.05;
   //dis quad
-  constexpr float c_drmax_disq_bh = 0.015;
-  constexpr float c_dzmax_disq_bh = 0.015;
-  constexpr float c_drmax_disq_eh = 0.015;
-  constexpr float c_dzmax_disq_eh = 0.015;
-  constexpr float c_drmax_disq_bl = 0.015;
-  constexpr float c_dzmax_disq_bl = 0.015;
-  constexpr float c_drmax_disq_el = 0.015;
-  constexpr float c_dzmax_disq_el = 0.015;
+  constexpr float c_drmax_disq_bh = 0.018;
+  constexpr float c_dzmax_disq_bh = 0.018;
+  constexpr float c_drmax_disq_eh = 0.05;
+  constexpr float c_dzmax_disq_eh = 0.05;
+  constexpr float c_drmax_disq_bl = 0.05;
+  constexpr float c_dzmax_disq_bl = 0.05;
+  constexpr float c_drmax_disq_el = 0.05;
+  constexpr float c_dzmax_disq_el = 0.05;
   //dis triplet
-  constexpr float c_drmax_dist_bh = 0.015;
-  constexpr float c_dzmax_dist_bh = 0.015;
-  constexpr float c_drmax_dist_eh = 0.015;
-  constexpr float c_dzmax_dist_eh = 0.015;
-  constexpr float c_drmax_dist_bl = 0.015;
-  constexpr float c_dzmax_dist_bl = 0.015;
-  constexpr float c_drmax_dist_el = 0.015;
-  constexpr float c_dzmax_dist_el = 0.015;
+  constexpr float c_drmax_dist_bh = 0.05;
+  constexpr float c_dzmax_dist_bh = 0.05;
+  constexpr float c_drmax_dist_eh = 0.05;
+  constexpr float c_dzmax_dist_eh = 0.05;
+  constexpr float c_drmax_dist_bl = 0.05;
+  constexpr float c_dzmax_dist_bl = 0.05;
+  constexpr float c_drmax_dist_el = 0.05;
+  constexpr float c_dzmax_dist_el = 0.05;
   
 
 

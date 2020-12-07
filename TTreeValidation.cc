@@ -1900,9 +1900,9 @@ void TTreeValidation::fillFakeRateTree(const Event& ev)
 
     // last hit info
     const Hit& lasthit = evt_layer_hits[seedtrack.getLastFoundHitLyr()][seedtrack.getLastFoundHitIdx()];
-    xhit_seed_FR_ = lasthit.x(); 
-    yhit_seed_FR_ = lasthit.y(); 
-    zhit_seed_FR_ = lasthit.z(); 
+    //xhit_seed_FR_ = lasthit.x(); 
+    //yhit_seed_FR_ = lasthit.y(); 
+    //zhit_seed_FR_ = lasthit.z(); 
     
     pt_seed_FR_   = seedtrack.pT();
     ept_seed_FR_  = seedtrack.epT();

@@ -193,7 +193,7 @@ public:
   float epT()     const { return state_.epT();}
   float emomPhi() const { return state_.emomPhi();}
   float emomEta() const { return state_.emomEta();}
-
+  float eposPhi() const { return state_.eposPhi();} 
   // ------------------------------------------------------------------------
 
   CUDA_CALLABLE int   charge() const { return state_.charge; }

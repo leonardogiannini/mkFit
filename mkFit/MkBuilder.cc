@@ -1104,10 +1104,21 @@ void MkBuilder::root_val_dumb_cmssw()
   // get labels correct first
   m_event->relabel_bad_seedtracks();
   m_event->relabel_cmsswtracks_from_seeds();
+  
+  std::cout << "I can see here" << std::endl;
+  std::cout <<  m_event->cmsswTracks_.size() << " " <<  m_event->candidateTracks_.size() << std::endl;
+  std::cout <<  m_event->cmsswTracks_.size() << " " <<  m_event->fitTracks_.size() << std::endl;
+  m_event->select_tracks_multiiter();
+  std::cout << "I can see here too " <<m_event->seedTracks_.size()<< std::endl;
+   std::cout << "I can see here" << std::endl;
+   std::cout <<  m_event->cmsswTracks_.size() << " " <<  m_event->candidateTracks_.size() << std::endl;
+  std::cout <<  m_event->cmsswTracks_.size() << " " <<  m_event->fitTracks_.size() << std::endl;
 
   // set the track collections to each other
   m_event->candidateTracks_ = m_event->cmsswTracks_;
   m_event->fitTracks_ = m_event->candidateTracks_;
+  std::cout <<  m_event->cmsswTracks_.size() << " " <<  m_event->candidateTracks_.size() << std::endl;
+  std::cout <<  m_event->cmsswTracks_.size() << " " <<  m_event->fitTracks_.size() << std::endl;
 
   // prep the tracks + extras
   prep_simtracks();
@@ -1222,7 +1233,7 @@ void MkBuilder::prep_simtracks()
     bool isSimSeed = false;
     for (const auto seedIDpair : seedIDMap)
     {
-      if (seedIDpair.second.size() == static_cast<size_t>(Config::nlayers_per_seed))
+      if (seedIDpair.second.size() >= static_cast<size_t>(4))//Config::nlayers_per_seed))
       {
 	isSimSeed = true;
 	break;
@@ -1471,7 +1482,8 @@ void MkBuilder::PrepareSeeds()
   else if (Config::seedInput == cmsswSeeds)
   {
     m_event->relabel_bad_seedtracks();
-    
+    m_event->select_tracks_multiiter();
+    std::cout << m_event->seedTracks_.size() << std::endl;
     // want to make sure we mark which sim tracks are findable based on cmssw seeds BEFORE seed cleaning
     if (Config::sim_val || Config::quality_val)
     {

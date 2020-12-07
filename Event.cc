@@ -1017,8 +1017,13 @@ int Event::clean_cms_seedtracks_multiiter()
     else if (algo==7) 
         dis_triplet.push_back(ts);
     else 
-        writetrack[ts]=false;
-      
+        writetrack[ts]=true;
+        if(tk.getHitLyr(0)==5
+     &&tk.getHitLyr(1)==4
+     &&tk.getHitLyr(2)==7
+     &&tk.getHitLyr(3)==6
+     &&tk.nTotalHits()==4
+     &&std::sqrt(std::fabs(tk.eposPhi())>0.000119561744214)) writetrack[ts]=false; 
   }
   
   sumof=0;
@@ -1118,18 +1123,6 @@ void Event::clean_indices_algo(unsigned int algo, std::vector<int> indices, std:
   }
     else if (algo==24)
   {
-    drmax_bh = Config::c_drmax_dist_bh;
-    dzmax_bh = Config::c_dzmax_dist_bh;
-    drmax_eh = Config::c_drmax_dist_eh;
-    dzmax_eh = Config::c_dzmax_dist_eh;
-    drmax_bl = Config::c_drmax_dist_bl;
-    dzmax_bl = Config::c_dzmax_dist_bl;
-    drmax_el = Config::c_drmax_dist_el;
-    dzmax_el = Config::c_dzmax_dist_el;
-    pt_thr = Config::c_ptthr_hpt; 
-  }
-  else if (algo==7)
-  {
     drmax_bh = Config::c_drmax_disq_bh;
     dzmax_bh = Config::c_dzmax_disq_bh;
     drmax_eh = Config::c_drmax_disq_eh;
@@ -1138,6 +1131,18 @@ void Event::clean_indices_algo(unsigned int algo, std::vector<int> indices, std:
     dzmax_bl = Config::c_dzmax_disq_bl;
     drmax_el = Config::c_drmax_disq_el;
     dzmax_el = Config::c_dzmax_disq_el;
+    pt_thr = Config::c_ptthr_hpt; 
+  }
+  else if (algo==7)
+  {
+    drmax_bh = Config::c_drmax_dist_bh;
+    dzmax_bh = Config::c_dzmax_dist_bh;
+    drmax_eh = Config::c_drmax_dist_eh;
+    dzmax_eh = Config::c_dzmax_dist_eh;
+    drmax_bl = Config::c_drmax_dist_bl;
+    dzmax_bl = Config::c_dzmax_dist_bl;
+    drmax_el = Config::c_drmax_dist_el;
+    dzmax_el = Config::c_dzmax_dist_el;
     pt_thr = Config::c_ptthr_hpt; 
   }
   else return;
@@ -1169,6 +1174,81 @@ void Event::clean_indices_algo(unsigned int algo, std::vector<int> indices, std:
 
   for(int ts=0; ts<ns; ts++){
     const Track & tk = seedTracks_[indices[ts]];
+    
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==2
+//         &&tk.getHitLyr(2)==3
+//         &&std::sqrt(std::fabs(tk.errors().At(4,5)))>0.00050253525842) writetrack[indices[ts]]=false;
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==1
+//         &&tk.getHitLyr(2)==3
+//         &&std::sqrt(std::fabs(tk.errors().At(4,5)))>0.000700171862263) writetrack[indices[ts]]=false;
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==46
+//         &&tk.getHitLyr(2)==47
+//         &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00117387296632) writetrack[indices[ts]]=false;
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==18
+//         &&tk.getHitLyr(2)==20
+//         &&std::sqrt(std::fabs(tk.errors().At(5,5)))>0.00276409136131) writetrack[indices[ts]]=false;
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==18
+//         &&tk.getHitLyr(2)==19
+//         &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00169135688338) writetrack[indices[ts]]=false;
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==1
+//         &&tk.getHitLyr(2)==2
+//         &&std::sqrt(std::fabs(tk.errors().At(4,5)))>0.000643403327558) writetrack[indices[ts]]=false;
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==19
+//         &&tk.getHitLyr(2)==20
+//         &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.0012461503502) writetrack[indices[ts]]=false;
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==45
+//         &&tk.getHitLyr(2)==46
+//         &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00179037591442) writetrack[indices[ts]]=false;
+//     if(tk.getHitLyr(0)==0
+//         &&tk.getHitLyr(1)==45
+//         &&tk.getHitLyr(2)==47
+//         &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00152743665967) writetrack[indices[ts]]=false;
+
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==2
+        &&tk.getHitLyr(2)==3
+        &&std::sqrt(std::fabs(tk.errors().At(4,5)))>0.000303113949485) writetrack[indices[ts]]=false;
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==1
+        &&tk.getHitLyr(2)==3
+        &&std::sqrt(std::fabs(tk.errors().At(4,5)))>0.000394634902477) writetrack[indices[ts]]=false;
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==46
+        &&tk.getHitLyr(2)==47
+        &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00060513895005) writetrack[indices[ts]]=false;
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==18
+        &&tk.getHitLyr(2)==20
+        &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00113504636101) writetrack[indices[ts]]=false;
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==18
+        &&tk.getHitLyr(2)==19
+        &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00110251747537) writetrack[indices[ts]]=false;
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==1
+        &&tk.getHitLyr(2)==2
+        &&std::sqrt(std::fabs(tk.errors().At(1,2)))>0.00151168485172) writetrack[indices[ts]]=false;
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==19
+        &&tk.getHitLyr(2)==20
+        &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.000638422672637) writetrack[indices[ts]]=false;
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==45
+        &&tk.getHitLyr(2)==46
+        &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00144568947144) writetrack[indices[ts]]=false;
+    if(tk.getHitLyr(0)==0
+        &&tk.getHitLyr(1)==45
+        &&tk.getHitLyr(2)==47
+        &&std::sqrt(std::fabs(tk.errors().At(2,2)))>0.00119766080752) writetrack[indices[ts]]=false;	    
+ 
     nHits[ts] = tk.nFoundHits();
     charge[ts] = tk.charge();
     oldPhi[ts] = tk.momPhi();
@@ -1273,6 +1353,60 @@ void Event::clean_indices_algo(unsigned int algo, std::vector<int> indices, std:
 
 }
 
+
+int Event::select_tracks_multiiter()
+{
+
+  //grouping tracks by algorithm
+  const int ns = seedTracks_.size();
+
+  TrackVec cleanSeedTracks;
+  cleanSeedTracks.reserve(ns);
+  std::vector<bool> writetrack(ns, true);
+
+  for(int ts=0; ts<ns; ts++){
+    const Track & tk = seedTracks_[ts];
+    unsigned int algo = tk.getAlgorithm();
+    if ( (algo!=9))//&&(algo!=5)&&(algo!=7)&&(algo!=22)&&(algo!=23)&&(algo!=24))
+        writetrack[ts]=false;
+      
+  }
+  
+  
+  for(int ts=0; ts<ns; ts++){    
+      if(writetrack[ts])
+          cleanSeedTracks.emplace_back(seedTracks_[ts]);
+
+  }
+  
+  seedTracks_.swap(cleanSeedTracks);
+
+    //grouping tracks by algorithm
+  const int nt = cmsswTracks_.size();
+
+  TrackVec cleanTracks;
+  cleanTracks.reserve(nt);
+  std::vector<bool> writetrack2(nt, true);
+
+  for(int ts=0; ts<nt; ts++){
+    const Track & tk = cmsswTracks_[ts];
+    unsigned int algo = tk.getAlgorithm();
+    if ( (algo!=9))//&&(algo!=5)&&(algo!=7)&&(algo!=22)&&(algo!=23)&&(algo!=24))
+        writetrack2[ts]=false;
+      
+  }
+  
+  
+  for(int ts=0; ts<nt; ts++){    
+      if(writetrack2[ts])
+          cleanTracks.emplace_back(cmsswTracks_[ts]);
+
+  }
+  
+  cmsswTracks_.swap(cleanTracks);
+  return cmsswTracks_.size()+seedTracks_.size();
+  
+}
 
 int Event::clean_cms_seedtracks_badlabel()
 {
