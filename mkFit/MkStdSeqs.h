@@ -31,6 +31,7 @@ namespace StdSeq
       
     void quality_filter(TrackVec &tracks, const int nMinHits);
     void find_duplicates_sharedhits(TrackVec &tracks, const float fraction);
+    void find_duplicates_sharedhits_pixelseed(TrackVec &tracks, const float fraction);
 
     template<class TRACK>
     bool qfilter_n_hits(const TRACK &t, int nMinHits)
